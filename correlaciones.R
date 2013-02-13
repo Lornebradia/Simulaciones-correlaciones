@@ -8,7 +8,7 @@
 # CREACIÓN PREVIA DEL DATA FRAME
 
 # Condiciones de simulación
-num.sim <- 10^2 # número de simulaciones
+num.sim <- 10^4 # número de simulaciones
 nfsr <- c(16, 20, 24, 30, 40) # tamaño muestral inicial de referencia
 corr.teo <- c(0,.20,.60,.80)
 
@@ -18,7 +18,11 @@ datos.corrs <- data.frame(corr_teo = rep(corr.teo,each=num.sim*length(nfsr)))
 datos.corrs$nfsr <- rep(nfsr,each=num.sim)
 # set.seed(1234)
 
-
+simCorr <- function(n,r){
+  muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2))
+  out.cor <- cor(muestra[,1],muestra[,2])
+  return(out.cor)
+}
 
 
 
