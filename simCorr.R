@@ -4,7 +4,7 @@ simCorr <- function(n,r){
   require(MASS)
   muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)) # Toma dos vectores de tamaño n, matriz de correlaciones Sigma
   out.cor <- cor(muestra[,1],muestra[,2]) # Calcula la correlación entre los dos vectores
-  tstat <- out.cor*(n-2)/sqrt(1-out.cor^2)
+  tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
   if (tstat <= 0){
     pvalue <- pt(tstat,n-2)
   }
