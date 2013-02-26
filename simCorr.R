@@ -12,5 +12,5 @@ simCorr <- function(n,r){
     pvalue <- 1-pt(tstat,n-2)
   }
   decision <- ifelse(pvalue<=.025,1,0) # Decisión == 1, rechaza hipótesis. 
-  return(c(out.cor,tstat,tpvalue,decision))
+  return(c(out.cor,tstat,pvalue,decision))
 }
