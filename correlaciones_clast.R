@@ -26,7 +26,7 @@ source(file="simCorrclast.R")
 # source(file="fisherZ.R")
 
 for (i in 1:dim(datos.corrsclast)[1]){
-  datos.corrsclast[i,3:7] <- simCorrclast(n = datos.corrsclast$nfsr[i], r = datos.corrsclast$corr_teo[i])
+  datos.corrsclast[i,3:7] <- simCorrclast(n = datos.corrsclast$nfsr[i], r = datos.corrsclast$corr_teo[i],asup=.25)
 }
 
 rm(i)
