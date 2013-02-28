@@ -1,13 +1,11 @@
 #====================================#
 #   SIMULACIONES CORRELACIONES       #
 #   Simulaciones empleando la        #
-#     regla CLAST para el            #
+#     REGLA TAMAÑO PREFIJADO para    #
 #     análisis de correlaciones      #
 #====================================#
 
-# CREACIÓN PREVIA DEL DATA FRAME
-
-# Condiciones de simulación
+# Condiciones de simulación-----
 library(MASS)
 num.sim <- 10^4 # número de simulaciones
 nfsr <- c(16, 20, 24, 30, 40) # tamaño muestral inicial de referencia
