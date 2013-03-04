@@ -31,16 +31,6 @@ for (i in 1:dim(datos.corrsclast)[1]){
 
 rm(i)
 
-datos.corrsclast$decision <- ifelse(datos.corrsclast$pvalue < .01, 1,0)
-
-for (i in 1:250000){
-  if (datos.corrsclast$nstop[i]==datos.corrsclast$nfsr[i]*1.5){
-    if (datos.corrsclast$pvalue[i] < .05){
-      datos.corrsclast$decision[i] <- 1
-    }
-  }
-}
-
 r.corrclast <- aggregate.data.frame(datos.corrsclast, by = list(datos.corrsclast$corr_teo,datos.corrsclast$nfsr),FUN=mean)
 
 # Gráficos -----
