@@ -60,4 +60,9 @@ clastcorr.pow <- clastcorr.pow +
 clastcorr.pow
 ggsave(plot=clastcorr.pow, "/Users/lbraschi/Documents/Investigación/Tesis/simulacion_correlaciones/corpowclast.png",height=8, width=12,dpi=600)
 
-
+histh0clast <- ggplot(datos.corrsclast[datos.corrsclast$corr_teo==0,],aes(x=tstat,y=..density..))+
+  geom_histogram(binwidth=1/10,fill="steelblue",color="black",prb=T)+
+  theme_bw()+
+  theme(plot.title=element_text(size=18))+
+  ggtitle("Histograma H0=VERDADERA, CLAST")
+ggsave(plot=histh0clast, "/Users/lbraschi/Documents/Investigación/Tesis/simulacion_correlaciones/histh0clast.png",height=8, width=12,dpi=600)

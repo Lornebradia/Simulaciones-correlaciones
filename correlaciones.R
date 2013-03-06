@@ -57,3 +57,10 @@ corr.pow <- corr.pow +
   scale_linetype_discrete(name="N fijo")+
   geom_hline(yintercept=.05, linetype=2,alpha=.5,size=1)
 ggsave(plot=corr.pow, "/Users/lbraschi/Documents/Investigación/Tesis/simulacion_correlaciones/corrpow.png",height=8, width=12,dpi=600)
+
+histh0 <- ggplot(datos.corrs[datos.corrs$corr_teo==0,],aes(x=tstat,y=..density..))+
+  geom_histogram(binwidth=1/10,fill="steelblue",color="black",prb=T)+
+  theme_bw()+geom_density(color="red",size=1,adjust=2)+
+  theme(plot.title=element_text(size=18))+
+  ggtitle("Histograma H0=VERDADERA, RTP")
+ggsave(plot=histh0, "/Users/lbraschi/Documents/Investigación/Tesis/simulacion_correlaciones/histh0.png",height=8, width=12,dpi=600)
