@@ -6,6 +6,6 @@ simCorr <- function(n,r){
   out.cor <- cor(muestra[,1],muestra[,2]) # Calcula la correlación entre los dos vectores
   tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
   pvalue <- ifelse(tstat<=0, pt(tstat,n-2),1-pt(tstat,n-2))
-  decision <- ifelse(pvalue<=.025,1,0) # Decisión == 1, rechaza hipótesis. 
+  decision <- ifelse(pvalue<=.05,1,0) # Decisión == 1, rechaza hipótesis. 
   return(c(out.cor,tstat,pvalue,decision))
 }
