@@ -1,7 +1,7 @@
 #====================================#
 #   SIMULACIONES CORRELACIONES       #
 #   Simulaciones empleando la        #
-#     REGLA CLAST para    #
+#     REGLA CLAST para               #
 #     análisis de correlaciones      #
 #====================================#
 
@@ -39,6 +39,18 @@ rm(i)
 datos.corrsclast$zfisher <- .5*log((1+datos.corrsclast$corr_emp)/(1-datos.corrsclast$corr_emp))
 datos.corrsclast$varteo.zfisher <- 1/(datos.corrsclast$nstop-3)
 
+# Calcula los límites para el intervalo de confianza de Z
+datos.corrsclast$ic95inf <- datos.corrsclast$zfisher+qnorm(.025)*sqrt(datos.corrsclast$varteo.zfisher)
+datos.corrsclast$ic95sup <- datos.corrsclast$zfisher+qnorm(.975)*sqrt(datos.corrsclast$varteo.zfisher)
+
+# Transforma los límites a correlaciones
+datos.corrsclast$ic95inf <- (exp(datos.corrsclast$ic95inf*2)-1)/(exp(2*datos.corrsclast$ic95inf)+1)
+datos.corrsclast$ic95sup <- (exp(datos.corrsclast$ic95sup*2)-1)/(exp(2*datos.corrsclast$ic95sup)+1)
+datos.corrsclast$ic95.zfisher <- ifelse(datos.corrsclast$corr_teo>datos.corrsclast$ic95inf 
+                                   & datos.corrsclast$corr_teo < datos.corrsclast$ic95sup, 
+                                   yes=0,
+                                   no=1)
+
 r.corrclast <- aggregate.data.frame(datos.corrsclast, by = list(datos.corrsclast$corr_teo,datos.corrsclast$nfsr),FUN=mean)
 r.corrclast$Group.1 <- r.corrclast$Group.2 <- NULL
 
@@ -48,7 +60,7 @@ r.corrclast$varemp.zfisher <- aggregate(datos.corrsclast$zfisher, by=list(datos.
 
 # Gráficos -----
 library(ggplot2)
-source("/Users/lbraschi/Documents/R Cosas/multiplot.R")
+source("/Users/lbraschi/Documents/R_Cosas/multiplot.R")
 
 clastcorr.plot <- ggplot(r.corrclast,aes(x=corr_teo,y=corr_emp))
 clastcorr.plot <- clastcorr.plot + 
