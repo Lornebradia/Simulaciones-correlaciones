@@ -1,0 +1,125 @@
+Contraste de correlaciones muestreo secuencial 
+========================================================
+author: Lorenzo Braschi Diaferia
+date: 
+transition: concave
+font-family: 'Helvetica'
+autosize: true
+
+Simulación regla fija
+========================================================
+type: section
+
+```{r, echo=FALSE}
+load("C:/Users/Lorenzo/Dropbox/Investigación/Tesis/simulacion_correlaciones/.RData")
+```
+
+Regla Fija
+========================================================
+
+Estructura de la regla fija: 
+
+```{r, eval=FALSE}
+function(n,r){
+  require(MASS)
+  muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)) 
+  out.cor <- cor(muestra[,1],muestra[,2]) 
+  tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
+  pvalue <- 1-pt(tstat,n-2)
+  decision <- ifelse(pvalue<=.05,1,0)  
+  return(c(out.cor,tstat,pvalue,decision))
+}
+```
+
+
+Estructura de la regla fija
+========================================================
+- Genera una muestra aleatoria de tamaño *n* de una distribución normal multivariante con matriz de correlaciones: 
+
+$$
+  \begin{aligned}
+  \Large
+  \begin{pmatrix}
+  1 & \rho \\
+  \rho & 1
+  \end{pmatrix}
+  \end{aligned}
+$$
+
+```{r, eval = FALSE}
+require(MASS)
+  muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2))
+```
+
+
+Estructura de la regla fija
+=======================================================
+
+- Calcula la correlación entre los dos vectores obtenidos. 
+
+```{r, eval=FALSE}
+out.cor <- cor(muestra[,1],muestra[,2])
+```
+
+- Realiza un contraste de hipótesis nula $H_0: \rho = 0$ mediante la transformación de Fisher. 
+
+```{r, eval=FALSE}
+tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
+```
+
+Estructura de la regla fija
+=======================================================
+- Obtiene el valor de probabilidad $p$, y acepta o rechaza la hipótesis nula con $p \le 0.05$. 
+
+```{r, eval=FALSE}
+pvalue <- 1-pt(tstat,n-2)
+decision <- ifelse(pvalue <=.05, 1, 0) 
+return(c(out.cor, tstat, pvalue, decision))
+```
+
+Condiciones de simulación
+=======================================================
+ 
+- Tamaños muestrales: 
+
+  $N = \{20,~30,~40,~50,~60\}$
+
+- Correlaciones poblacionales: 
+
+  $\rho = \{0,~0.1,~0.2,~0.3 ...~0.8,~0.99\}$
+  
+  
+Resultados de la simulación
+=======================================================     
+
+```{r, echo=FALSE}
+datos.corrs[1:8, c(1,3:6)]
+```
+
+Cálculos
+=======================================================
+Se calculan: 
+
+- La transformación de Fisher de la correlación empírica obtenida. 
+
+$$latex
+Z = 0.5 \left(  \ln \frac {1 + r} {1 - r} \right)
+$$
+
+- La varianza teórica 
+
+
+Gráficos
+=======================================================
+
+```{r, echo=FALSE, fig=TRUE,fig.align='center'}
+print(corr.plot)
+```
+
+Potencia
+=======================================================
+
+```{r, echo=FALSE, fig.align='center'}
+print(corr.pow  )
+```
+

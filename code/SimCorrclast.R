@@ -1,6 +1,6 @@
 # simCorrclast function genera 
 
-simCorrclast <- function(n,r,asup,ainf=.005){
+SimCorrclast <- function(n,r,asup,ainf=.005){
   require(MASS)
   muestra <- mvrnorm(n/2, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2))
   out.cor <- cor(muestra[,1],muestra[,2])

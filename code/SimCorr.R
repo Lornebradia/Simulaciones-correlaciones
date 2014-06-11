@@ -1,6 +1,6 @@
 # simCorr function. Esta función toma dos muestras de tamaño n de la distribución normal multivariante con correlaciones marcadas por r en la matriz de correlaciones Sigma. Las medias de las distribuciones poblacionales se fijan a cero. 
 
-simCorr <- function(n,r){
+SimCorr <- function(n,r){
   require(MASS)
   muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)) # Toma dos vectores de tamaño n, matriz de correlaciones Sigma
   out.cor <- cor(muestra[,1],muestra[,2]) # Calcula la correlación entre los dos vectores
