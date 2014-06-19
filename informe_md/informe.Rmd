@@ -4,17 +4,16 @@ Contraste de correlaciones muestreo secuencial
 Simulación con regla de parada fija
 --------------------------------------------------------
 
-```{r, echo=FALSE}
+```{r import, echo=FALSE}
 load("C:/Users/Lorenzo/Dropbox/Investigación/Tesis/simulacion_correlaciones/.RData")
 ```
 
 La regla de parada fija es el procedimiento estándar para el contraste de hipótesis. Se selecciona una muestra de tamaño n en función del tamaño del efecto que se desea detectar y de la potencia deseada para detectarlo. Una vez fijado ese tamaño muestral, se recogen los datos y se analizan. 
 
 ### Estructura de la regla fija
-
 En el contexto de esta simulación, la estructura de la regla de muestreo fija es la siguiente: 
 
-```{r, eval = F}
+```{r SimCorr, eval = F}
 SimCorr <- function(n,r){
   require(MASS)
   muestra <- mvrnorm(n, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)) 
@@ -65,7 +64,7 @@ En primer lugar, se evalúan las correlaciones medias tras 10,000 simulaciones p
 Dado que en meta-análisis es más común analizar estudios de correlaciones empleando la transformación de Fisher, se transforman las correlaciones obtenidas a Z: 
 
 $$latex
-Z = 0.5 \left(  \ln \frac {1 + r} {1 - r} \right)
+Z = 0.5 \cdot  \ln \left(\frac {1 + r} {1 - r} \right)
 $$
 
 En meta-análisis es común ponderar la Z de Fisher obtenida en un estudio primario por el inverso de su varianza. Dicha varianza viene dada por:
@@ -74,15 +73,129 @@ $$latex
 var(Z) = \frac{1}{n_i - 3}
 $$
 
-Esta varianza puede ser considerada la “varianza teórica” de Z, esto es, la varianza estimada a partir del tamaño de la muestra. Por el contrario, en simulación es posible calcular la “varianza empírica” de Z, como la varianza de los valores de Z calculados en cada una de las simulaciones. Se puede así valorar si esta estimación converge hacia el valor de la varianza empírica. 
+Esta varianza puede ser considerada la *varianza teórica* de Z, esto es, la varianza estimada a partir del tamaño de la muestra. Por el contrario, en simulación es posible calcular la *varianza empírica* de Z, como la varianza de los valores de Z calculados en cada una de las simulaciones. Se puede así valorar si esta estimación converge hacia el valor de la varianza empírica. 
 
-Se evalúa además la tasa empírica de rechazos de la $H_0$ a lo largo de las 10,000 simulaciones en cada condición. Cuando $H_0$ es verdadera (es decir, cuando $\rho = 0$), dicha tasa corresponde a la probabilidad de error tipo I. Cuando es falsa ($\rho > 0$), corresponde a la potencia de la prueba. 
+Se evalúa además la *tasa empírica de rechazos* de la $H_0$ a lo largo de las 10,000 simulaciones en cada condición. Cuando $H_0$ es verdadera (es decir, cuando $\rho = 0$), dicha tasa corresponde a la probabilidad de error tipo I. Cuando es falsa ($\rho > 0$), corresponde a la potencia de la prueba. 
 
-Se calculan también los intervalos de confianza con $\alpha = 0.05$ para los valores de $\rho$. Dichos valores se calculan a partir de las transformaciones Z mediante la fórmula: 
+Se calculan también los *intervalos de confianza* con $\alpha = 0.05$ para los valores de $\rho$. Dichos valores se calculan a partir de las transformaciones Z mediante la fórmula: 
 
 $$latex
 IC_{95} = Z \pm \frac{1.96} {\sqrt{n - 3}}
 $$
 
+El intervalo de confianza así construído se transforma de vuelta a valores de $\rho$ mediante la fórmula 
 
-- La cobertura de los intervalos de confianza al 95%
+$$latex
+r = \frac{e^{2z} -1} {e^{2z} + 1}
+$$
+
+Se construye así un intervalo de confianza para cada resultado de simulación y se determina si el valor del parámetro $\rho$ se encuentra dentro del intervalo; esto equivale al test de significación mediante intervalos de confianza. Se determina la proporción de casos en los que el valor de r está incluido en el intervalo, es decir, la *cobertura* de la prueba. 
+
+### Resultados
+La siguiente tabla muestra los resultados resumidos para la RTP: 
+
+```{r tabla rtp, echo=F, results='asis'}
+library(xtable)
+r.corrxtable <- xtable(r.corr, digits = c(0, 2, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4))
+print.xtable(r.corrxtable, type = "html")
+```
+
+En primer lugar, se comprueba que las muestras extraídas convergen hacia la correlación teórica. Esto es, se comprueba que para cada condición de simulación la media de las 10,000 correlaciones generadas se aproxima al valor de $\rho$. El siguiente gráfico muestra el ajuste: 
+
+```{r corr.plot, echo=FALSE, fig.align='center'}
+print(corr.plot)
+```
+
+La diferencia máxima entre la correlación teórica $\rho$ y la empírica es de `r max(r.corr$corr_teo-r.corr$corr_emp)`.
+
+Con la hipótesis nula verdadera ($\rho = 0$), la tasa empírica de rechazos (EPR) se mantiene alrededor del valor nominal de 0,05. El valor de la Z de Fisher se mantiene alrededor de 0. Para los distintos valores de $\rho$ cuando la hipótesis nula es falsa, la tasa empírica de rechazos (es decir, la potencia) aumenta a medida que se incrementa el tamaño de la muestra *n* y el valor de la correlación poblacional. 
+
+Los intervalos de confianza incluyen el valor del parámetro $\rho$ aproximadamente en el 95% de los casos, con aparente independencia del valor de $\rho$ y del tamaño de la muestra. 
+
+La gráfica siguiente muestra la tasa empírica de rechazos con la regla fija: 
+
+```{r graf_epr, echo=FALSE, fig.align='center'}
+library(ggplot2)
+corr.pow
+``` 
+
+Los siguientes dos gráficos muestran las varianzas de la Z de Fisher, la teórica (que será constante para todo $\rho$) y la empírica. En general, la varianza empírica de Z se ajusta bastante bien a la varianza teórica para todos los tamaños muestrales. 
+
+```{r varianzas_z, echo=FALSE, fig.align='center',fig.width=16}
+library(grid)
+source("C:/Users/Lorenzo/Dropbox/R Cosas/multiplot.R")
+multiplot(corr.varzteo, corr.varzemp, cols=2)
+```
+
+La cobertura de los intervalos de confianza para la regla del tamaño prefijado se muestra en el gráfico siguiente. Empleando como estadístico la Z transformada de Fisher, se obtiene un intervalo de confianza simétrico centrado en dicha Z. Si en cambio los intervalos de confianza se vuelven a transformar a correlaciones de Pearson, dichos intervalos ya no son simétricos (dado que la transformación Z no es una transformación lineal).
+
+```{r cobertura1, echo=FALSE, fig.align='center'}
+corr.ic95z
+corr.ic95r
+```
+
+Globalmente, la cobertura de los intervalos de confianza se ajusta bastante bien al valor nominal de 0,95. 
+
+```{r cobertura2, echo=FALSE, fig.align='center'}
+cobertura_rtp
+```
+
+Simulación con la regla CLAST
+----------------------------------------------------------
+
+La regla CLAST es un procedimiento para contrastar hipótesis mediante "data peeking" de forma que se mantenga bajo control el error tipo I. Se fija en primer lugar el tamaño de la muestra necesario (tamaño de referencia o *nfsr*) para detectar un determinado tamaño del efecto con una potencia deseada. Se toma entonces la mitad de dicho tamaño muestral y se realiza un contraste de hipótesis con dicha muestra. Se definen tres zonas en la distribución del estadístico de contraste: una zona de rechazo, una zona de mantenimiento, y una zona intermedia de incertidumbre. Si el estadístico de contraste cae en esta región, se añade un elemento a la muestra y se realiza un nuevo contraste. Este procedimiento se itera, bien hasta que se alcanza una zona de decisión (rechazo o mantenimiento), o un tamaño muestral máximo igual a 1.5 veces el tamaño de referencia. En este caso, el procedimiento se detiene y se toma una decisión con un alfa convencional de 0.05. 
+
+### Estructura de la regla CLAST
+
+```{r SimCorrclast, echo=T, eval=FALSE}
+function(n,r,asup,ainf=.005){
+  require(MASS)
+  muestra <- mvrnorm(n/2, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2))
+  out.cor <- cor(muestra[,1],muestra[,2])
+  tstat <- out.cor*sqrt(dim(muestra)[1]-2)/sqrt(1-out.cor^2)
+  pvalue <- 1-pt(tstat,dim(muestra)[1]-2)
+  while (pvalue<asup && pvalue>ainf){
+    muestra <- rbind(muestra,mvrnorm(1, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)))
+    out.cor <- cor(muestra[,1],muestra[,2])
+    tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
+    pvalue <- 1-pt(tstat,dim(muestra)[1]-2)
+    if (dim(muestra)[1]==n*1.5){
+      decision <- ifelse(pvalue<.05,1,0)
+      break
+    }
+  }
+    if (dim(muestra)[1]<n*1.5){
+      decision <- ifelse(pvalue<.01,1,0)
+    }
+  return(c(dim(muestra)[1],out.cor,tstat,pvalue,decision))
+}
+
+```
+
+La estructura de CLAST es similar a la RTP, con la salvedad de que en caso de que el estadístico de contraste caiga en una región de incertidumbre definida entre $\alpha_s$ y $\alpha_i$ se añaden un par de elementos a la muestra y se realiza un nuevo contraste. 
+
+```{r regiones_clast, fig.align='center', echo=FALSE}
+x <- seq(-4,4,length = 100000)
+y <- dnorm(x)
+
+plot(x,y,type = "l", bty = "n", yaxt=  "n", ylab = "", xlab = "")
+
+a2 <- qnorm(.75)
+a1 <- qnorm(.99) 
+x <- seq(a2,4, length = 10000)
+y <- dnorm(x)
+polygon(c(a2,x,a1), c(0,y,0), col = "lightgrey")
+x <- seq(a1,4, length = 10000)
+y <- dnorm(x)
+polygon(c(a1,x,4), c(0,y,0), col = "darkgrey")
+
+arrows(-1.5,.3,0,.1,length=.1,lwd=2)
+text(-2,.3,pos=3,cex=1.25,"Maintenance area")
+arrows(1.3,.25,1.25,.1,length=.1,lwd=2,col="steelblue")
+text(1.5,.25,pos=3,cex=1.25,"Uncertainty area",col="steelblue")
+arrows(3,.15,2.75,.01,length=.1,lwd=2)
+text(3,.15,pos=3,cex=1.25,"Rejection area",col="#CC0000")
+```
+
+
+

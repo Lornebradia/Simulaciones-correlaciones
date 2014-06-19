@@ -5,6 +5,15 @@ Simulación con regla de parada fija
 --------------------------------------------------------
 
 
+```
+## Warning: cannot open compressed file
+## 'C:/Users/Lorenzo/Dropbox/Investigación/Tesis/simulacion_correlaciones/.RData',
+## probable reason 'No such file or directory'
+```
+
+```
+## Error: cannot open the connection
+```
 
 
 La regla de parada fija es el procedimiento estándar para el contraste de hipótesis. Se selecciona una muestra de tamaño n en función del tamaño del efecto que se desea detectar y de la potencia deseada para detectarlo. Una vez fijado ese tamaño muestral, se recogen los datos y se analizan. 
@@ -96,7 +105,7 @@ Se construye así un intervalo de confianza para cada resultado de simulación y
 La siguiente tabla muestra los resultados resumidos para la RTP: 
 
 <!-- html table generated in R 3.0.3 by xtable 1.7-3 package -->
-<!-- Wed Jun 18 15:59:07 2014 -->
+<!-- Tue Jun 17 11:59:49 2014 -->
 <TABLE border=1>
 <TR> <TH>  </TH> <TH> corr_teo </TH> <TH> nfsr </TH> <TH> EPR </TH> <TH> zfisher </TH> <TH> corr_emp </TH> <TH> theo_var_z </TH> <TH> emp_var_z </TH> <TH> cover_ic </TH> <TH> limit_z_inf </TH> <TH> limit_z_sup </TH> <TH> limit_r_inf </TH> <TH> limit_r_sup </TH>  </TR>
   <TR> <TD align="right"> 1 </TD> <TD align="right"> 0.00 </TD> <TD> 20 </TD> <TD align="right"> 0.0511 </TD> <TD align="right"> -0.0006 </TD> <TD align="right"> -0.0006 </TD> <TD align="right"> 0.0588 </TD> <TD align="right"> 0.0586 </TD> <TD align="right"> 0.0491 </TD> <TD align="right"> -0.4760 </TD> <TD align="right"> 0.4747 </TD> <TD align="right"> -0.4237 </TD> <TD align="right"> 0.4228 </TD> </TR>
@@ -207,37 +216,28 @@ La regla CLAST es un procedimiento para contrastar hipótesis mediante "data pee
 ### Estructura de la regla CLAST
 
 
-```r
-function(n, r, asup, ainf = 0.005) {
-    require(MASS)
-    muestra <- mvrnorm(n/2, Sigma = matrix(c(1, r, r, 1), 2), mu = rep(0, 2))
-    out.cor <- cor(muestra[, 1], muestra[, 2])
-    tstat <- out.cor * sqrt(dim(muestra)[1] - 2)/sqrt(1 - out.cor^2)
-    pvalue <- 1 - pt(tstat, dim(muestra)[1] - 2)
-    while (pvalue < asup && pvalue > ainf) {
-        muestra <- rbind(muestra, mvrnorm(1, Sigma = matrix(c(1, r, r, 1), 2), 
-            mu = rep(0, 2)))
-        out.cor <- cor(muestra[, 1], muestra[, 2])
-        tstat <- out.cor * sqrt(n - 2)/sqrt(1 - out.cor^2)
-        pvalue <- 1 - pt(tstat, dim(muestra)[1] - 2)
-        if (dim(muestra)[1] == n * 1.5) {
-            decision <- ifelse(pvalue < 0.05, 1, 0)
-            break
-        }
-    }
-    if (dim(muestra)[1] < n * 1.5) {
-        decision <- ifelse(pvalue < 0.01, 1, 0)
-    }
-    return(c(dim(muestra)[1], out.cor, tstat, pvalue, decision))
-}
-
 ```
-
-
-La estructura de CLAST es similar a la RTP, con la salvedad de que en caso de que el estadístico de contraste caiga en una región de incertidumbre definida entre $\alpha_s$ y $\alpha_i$ se añaden un par de elementos a la muestra y se realiza un nuevo contraste. 
-
-<img src="figure/regiones_clast.png" title="plot of chunk regiones_clast" alt="plot of chunk regiones_clast" style="display: block; margin: auto;" />
-
-
+## function(n,r,asup,ainf=.005){
+##   require(MASS)
+##   muestra <- mvrnorm(n/2, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2))
+##   out.cor <- cor(muestra[,1],muestra[,2])
+##   tstat <- out.cor*sqrt(dim(muestra)[1]-2)/sqrt(1-out.cor^2)
+##   pvalue <- 1-pt(tstat,dim(muestra)[1]-2)
+##   while (pvalue<asup && pvalue>ainf){
+##     muestra <- rbind(muestra,mvrnorm(1, Sigma = matrix(c(1,r,r,1),2),mu = rep(0,2)))
+##     out.cor <- cor(muestra[,1],muestra[,2])
+##     tstat <- out.cor*sqrt(n-2)/sqrt(1-out.cor^2)
+##     pvalue <- 1-pt(tstat,dim(muestra)[1]-2)
+##     if (dim(muestra)[1]==n*1.5){
+##       decision <- ifelse(pvalue<.05,1,0)
+##       break
+##     }
+##   }
+##     if (dim(muestra)[1]<n*1.5){
+##       decision <- ifelse(pvalue<.01,1,0)
+##     }
+##   return(c(dim(muestra)[1],out.cor,tstat,pvalue,decision))
+## }
+```
 
 
